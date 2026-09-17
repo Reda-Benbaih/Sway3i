@@ -14,6 +14,5 @@ import lombok.AllArgsConstructor;
 @Getter
 @Setter
 @SuperBuilder
-@AllArgsConstructor
 public class Admin extends User {
 }
