@@ -28,7 +28,7 @@ public class SessionService {
 
     public SessionResponse getSessionById(Long id) {
         Session session = sessionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("session with this " + id + " does not exist"));
+                .orElseThrow(() -> new RuntimeException("session with this" + id + "does not exist"));
         return sessionMapper.toResponse(session);
     }
 
@@ -49,7 +49,7 @@ public class SessionService {
                 .orElseThrow(() -> new RuntimeException("session with this " + id + " does not exist"));
 
         CourseListing courseListing = courseListingRepository.findById(request.getCourseListingId())
-                .orElseThrow(() -> new RuntimeException("course listing with this " + request.getCourseListingId() + " does not exist"));
+                .orElseThrow(() -> new RuntimeException("course listing with this" + request.getCourseListingId() + " does not exist"));
 
         existingSession.setDate(request.getDate());
         existingSession.setStartTime(request.getStartTime());
