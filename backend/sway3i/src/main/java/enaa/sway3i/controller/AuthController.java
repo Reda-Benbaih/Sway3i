@@ -35,7 +35,7 @@ public class AuthController {
         AuthResponse authResponse = new AuthResponse(
                 token,
                 "Bearer",
-                86400, // Matches 24 hours in JwtUtil
+                86400,
                 user.getId(),
                 user.getEmail(),
                 user.getRole().name()
