@@ -8,6 +8,7 @@ import enaa.sway3i.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,7 @@ public class AdminService {
 
     private final AdminRepository adminRepository;
     private final AdminMapper adminMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public Page<AdminResponse> getAllAdmins(Pageable pageable) {
         Page<Admin> admins = adminRepository.findAll(pageable);
@@ -30,6 +32,7 @@ public class AdminService {
 
     public AdminResponse createAdmin(AdminRequest request) {
         Admin admin = adminMapper.toEntity(request);
+        admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         Admin savedAdmin = adminRepository.save(admin);
         return adminMapper.toResponse(savedAdmin);
     }
@@ -41,7 +44,9 @@ public class AdminService {
         existingAdmin.setFirstName(request.getFirstName());
         existingAdmin.setLastName(request.getLastName());
         existingAdmin.setEmail(request.getEmail());
-        existingAdmin.setPassword(request.getPassword());
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            existingAdmin.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         existingAdmin.setPhone(request.getPhone());
         existingAdmin.setCity(request.getCity());
 

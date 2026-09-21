@@ -8,6 +8,7 @@ import enaa.sway3i.repository.TutorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,7 @@ public class TutorService {
 
     private final TutorRepository tutorRepository;
     private final TutorMapper tutorMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public Page<TutorResponse> getAllTutors(Pageable pageable) {
         Page<Tutor> tutors = tutorRepository.findAll(pageable);
@@ -30,6 +32,7 @@ public class TutorService {
 
     public TutorResponse createTutor(TutorRequest request) {
         Tutor tutor = tutorMapper.toEntity(request);
+        tutor.setPassword(passwordEncoder.encode(tutor.getPassword()));
         Tutor savedTutor = tutorRepository.save(tutor);
         return tutorMapper.toResponse(savedTutor);
     }
@@ -41,7 +44,9 @@ public class TutorService {
         existingTutor.setFirstName(request.getFirstName());
         existingTutor.setLastName(request.getLastName());
         existingTutor.setEmail(request.getEmail());
-        existingTutor.setPassword(request.getPassword());
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            existingTutor.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         existingTutor.setPhone(request.getPhone());
         existingTutor.setCity(request.getCity());
         existingTutor.setBiography(request.getBiography());
