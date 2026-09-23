@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,11 +35,13 @@ public class TutorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('TUTOR', 'ADMIN')")
     public ResponseEntity<TutorResponse> updateTutor(@PathVariable Long id, @Valid @RequestBody TutorRequest request) {
         return ResponseEntity.ok(tutorService.updateTutor(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('TUTOR', 'ADMIN')")
     public ResponseEntity<Void> deleteTutor(@PathVariable Long id) {
         tutorService.deleteTutor(id);
         return ResponseEntity.noContent().build();

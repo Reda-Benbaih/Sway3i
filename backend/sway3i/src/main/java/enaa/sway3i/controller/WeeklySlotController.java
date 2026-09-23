@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,16 +30,19 @@ public class WeeklySlotController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('TUTOR', 'ADMIN')")
     public ResponseEntity<WeeklySlotResponse> createWeeklySlot(@Valid @RequestBody WeeklySlotRequest request) {
         return new ResponseEntity<>(weeklySlotService.createWeeklySlot(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('TUTOR', 'ADMIN')")
     public ResponseEntity<WeeklySlotResponse> updateWeeklySlot(@PathVariable Long id, @Valid @RequestBody WeeklySlotRequest request) {
         return ResponseEntity.ok(weeklySlotService.updateWeeklySlot(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('TUTOR', 'ADMIN')")
     public ResponseEntity<Void> deleteWeeklySlot(@PathVariable Long id) {
         weeklySlotService.deleteWeeklySlot(id);
         return ResponseEntity.noContent().build();

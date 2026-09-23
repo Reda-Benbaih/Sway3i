@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,16 +30,19 @@ public class EnrollmentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('STUDENT', 'ADMIN')")
     public ResponseEntity<EnrollmentResponse> createEnrollment(@Valid @RequestBody EnrollmentRequest request) {
         return new ResponseEntity<>(enrollmentService.createEnrollment(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('TUTOR', 'ADMIN')")
     public ResponseEntity<EnrollmentResponse> updateEnrollment(@PathVariable Long id, @Valid @RequestBody EnrollmentRequest request) {
         return ResponseEntity.ok(enrollmentService.updateEnrollment(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('STUDENT', 'TUTOR', 'ADMIN')")
     public ResponseEntity<Void> deleteEnrollment(@PathVariable Long id) {
         enrollmentService.deleteEnrollment(id);
         return ResponseEntity.noContent().build();
