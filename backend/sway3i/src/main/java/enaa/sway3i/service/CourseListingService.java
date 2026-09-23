@@ -3,6 +3,7 @@ package enaa.sway3i.service;
 import enaa.sway3i.dto.request.CourseListingRequest;
 import enaa.sway3i.dto.response.CourseListingResponse;
 import enaa.sway3i.mapper.CourseListingMapper;
+import enaa.sway3i.model.CourseFormat;
 import enaa.sway3i.model.CourseListing;
 import enaa.sway3i.model.Subject;
 import enaa.sway3i.model.Tutor;
@@ -13,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,22 @@ public class CourseListingService {
     public Page<CourseListingResponse> getAllCourseListings(Pageable pageable) {
         Page<CourseListing> courseListings = courseListingRepository.findAll(pageable);
         return courseListings.map(courseListingMapper::toResponse);
+    }
+
+    public List<CourseListingResponse> searchCourseListings(Long subjectId, CourseFormat courseFormat,
+                                                              BigDecimal minPrice, BigDecimal maxPrice,
+                                                              String location) {
+        List<CourseListing> courseListings = courseListingRepository.findByIsActiveTrue();
+
+        return courseListings.stream()
+                .filter(c -> subjectId == null || c.getSubject().getId().equals(subjectId))
+                .filter(c -> courseFormat == null || c.getCourseFormat() == courseFormat)
+                .filter(c -> minPrice == null || c.getMonthlyPrice().compareTo(minPrice) >= 0)
+                .filter(c -> maxPrice == null || c.getMonthlyPrice().compareTo(maxPrice) <= 0)
+                .filter(c -> location == null || (c.getLocationOrLink() != null
+                        && c.getLocationOrLink().toLowerCase().contains(location.toLowerCase())))
+                .map(courseListingMapper::toResponse)
+                .toList();
     }
 
     public CourseListingResponse getCourseListingById(Long id) {

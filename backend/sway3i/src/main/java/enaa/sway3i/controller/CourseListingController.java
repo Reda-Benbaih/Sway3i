@@ -2,6 +2,7 @@ package enaa.sway3i.controller;
 
 import enaa.sway3i.dto.request.CourseListingRequest;
 import enaa.sway3i.dto.response.CourseListingResponse;
+import enaa.sway3i.model.CourseFormat;
 import enaa.sway3i.service.CourseListingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/course-listings")
@@ -22,6 +26,17 @@ public class CourseListingController {
     @GetMapping
     public ResponseEntity<Page<CourseListingResponse>> getAllCourseListings(Pageable pageable) {
         return ResponseEntity.ok(courseListingService.getAllCourseListings(pageable));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<CourseListingResponse>> searchCourseListings(
+            @RequestParam(required = false) Long subjectId,
+            @RequestParam(required = false) CourseFormat courseFormat,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) String location) {
+        return ResponseEntity.ok(courseListingService.searchCourseListings(
+                subjectId, courseFormat, minPrice, maxPrice, location));
     }
 
     @GetMapping("/{id}")

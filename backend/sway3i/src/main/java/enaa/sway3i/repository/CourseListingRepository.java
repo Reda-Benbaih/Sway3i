@@ -10,4 +10,5 @@ import java.util.List;
 public interface CourseListingRepository extends JpaRepository<CourseListing, Long> {
     List<CourseListing> findByTutorId(Long tutorId);
     List<CourseListing> findBySubjectId(Long subjectId);
+    List<CourseListing> findByIsActiveTrue();
 }

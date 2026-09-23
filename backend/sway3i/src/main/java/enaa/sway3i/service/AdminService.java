@@ -4,12 +4,15 @@ import enaa.sway3i.dto.request.AdminRequest;
 import enaa.sway3i.dto.response.AdminResponse;
 import enaa.sway3i.mapper.AdminMapper;
 import enaa.sway3i.model.Admin;
+import enaa.sway3i.model.Role;
 import enaa.sway3i.repository.AdminRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,8 @@ public class AdminService {
     public AdminResponse createAdmin(AdminRequest request) {
         Admin admin = adminMapper.toEntity(request);
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
+        admin.setRole(Role.ADMIN);
+        admin.setCreatedAt(LocalDateTime.now());
         Admin savedAdmin = adminRepository.save(admin);
         return adminMapper.toResponse(savedAdmin);
     }

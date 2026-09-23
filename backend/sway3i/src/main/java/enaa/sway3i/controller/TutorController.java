@@ -30,6 +30,7 @@ public class TutorController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TutorResponse> createTutor(@Valid @RequestBody TutorRequest request) {
         return new ResponseEntity<>(tutorService.createTutor(request), HttpStatus.CREATED);
     }

@@ -9,12 +9,22 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null
   })
 
-  const login = async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password })
+  const storeSession = (data) => {
     const loggedUser = { userId: data.userId, email: data.email, role: data.role }
     localStorage.setItem('accessToken', data.accessToken)
     localStorage.setItem('user', JSON.stringify(loggedUser))
     setUser(loggedUser)
+  }
+
+  const login = async (email, password) => {
+    const { data } = await api.post('/auth/login', { email, password })
+    storeSession(data)
+  }
+
+  const register = async (role, payload) => {
+    const endpoint = role === 'STUDENT' ? '/auth/register/student' : '/auth/register/tutor'
+    const { data } = await api.post(endpoint, payload)
+    storeSession(data)
   }
 
   const logout = () => {
@@ -24,7 +34,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )

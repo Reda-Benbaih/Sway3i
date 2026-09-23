@@ -3,6 +3,7 @@ package enaa.sway3i.service;
 import enaa.sway3i.dto.request.TutorRequest;
 import enaa.sway3i.dto.response.TutorResponse;
 import enaa.sway3i.mapper.TutorMapper;
+import enaa.sway3i.model.Role;
 import enaa.sway3i.model.Tutor;
 import enaa.sway3i.repository.TutorRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,9 @@ public class TutorService {
     public TutorResponse createTutor(TutorRequest request) {
         Tutor tutor = tutorMapper.toEntity(request);
         tutor.setPassword(passwordEncoder.encode(tutor.getPassword()));
+        tutor.setRole(Role.TUTOR);
+        tutor.setCreatedAt(LocalDateTime.now());
+        tutor.setIsVerified(false);
         Tutor savedTutor = tutorRepository.save(tutor);
         return tutorMapper.toResponse(savedTutor);
     }

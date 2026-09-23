@@ -30,6 +30,7 @@ public class StudentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StudentResponse> createStudent(@Valid @RequestBody StudentRequest request) {
         return new ResponseEntity<>(studentService.createStudent(request), HttpStatus.CREATED);
     }
