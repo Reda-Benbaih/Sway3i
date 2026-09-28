@@ -3,6 +3,7 @@ package enaa.sway3i.controller;
 import enaa.sway3i.dto.request.CourseListingRequest;
 import enaa.sway3i.dto.response.CourseListingResponse;
 import enaa.sway3i.model.CourseFormat;
+import enaa.sway3i.model.Level;
 import enaa.sway3i.service.CourseListingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +33,18 @@ public class CourseListingController {
     public ResponseEntity<List<CourseListingResponse>> searchCourseListings(
             @RequestParam(required = false) Long subjectId,
             @RequestParam(required = false) CourseFormat courseFormat,
+            @RequestParam(required = false) Level level,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) BigDecimal maxHourlyRate,
             @RequestParam(required = false) String location) {
         return ResponseEntity.ok(courseListingService.searchCourseListings(
-                subjectId, courseFormat, minPrice, maxPrice, location));
+                subjectId, courseFormat, level, minPrice, maxPrice, maxHourlyRate, location));
+    }
+
+    @GetMapping("/by-tutor/{tutorId}")
+    public ResponseEntity<List<CourseListingResponse>> getCourseListingsByTutor(@PathVariable Long tutorId) {
+        return ResponseEntity.ok(courseListingService.getCourseListingsByTutor(tutorId));
     }
 
     @GetMapping("/{id}")

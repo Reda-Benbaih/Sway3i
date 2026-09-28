@@ -25,4 +25,5 @@ public class StudentResponse {
     private LocalDateTime createdAt;
     private Level level;
     private String school;
+    private String preferences;
 }

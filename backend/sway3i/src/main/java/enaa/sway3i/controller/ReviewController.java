@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/reviews")
 @RequiredArgsConstructor
@@ -22,6 +24,17 @@ public class ReviewController {
     @GetMapping
     public ResponseEntity<Page<ReviewResponse>> getAllReviews(Pageable pageable) {
         return ResponseEntity.ok(reviewService.getAllReviews(pageable));
+    }
+
+    @GetMapping("/by-tutor/{tutorId}")
+    public ResponseEntity<List<ReviewResponse>> getReviewsByTutor(@PathVariable Long tutorId) {
+        return ResponseEntity.ok(reviewService.getReviewsByTutor(tutorId));
+    }
+
+    @GetMapping("/by-enrollment/{enrollmentId}")
+    public ResponseEntity<ReviewResponse> getReviewByEnrollment(@PathVariable Long enrollmentId) {
+        ReviewResponse response = reviewService.getReviewByEnrollment(enrollmentId);
+        return response != null ? ResponseEntity.ok(response) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{id}")

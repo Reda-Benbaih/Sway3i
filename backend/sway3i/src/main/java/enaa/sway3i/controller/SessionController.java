@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/sessions")
 @RequiredArgsConstructor
@@ -22,6 +24,11 @@ public class SessionController {
     @GetMapping
     public ResponseEntity<Page<SessionResponse>> getAllSessions(Pageable pageable) {
         return ResponseEntity.ok(sessionService.getAllSessions(pageable));
+    }
+
+    @GetMapping("/by-course-listing/{courseListingId}")
+    public ResponseEntity<List<SessionResponse>> getSessionsByCourseListing(@PathVariable Long courseListingId) {
+        return ResponseEntity.ok(sessionService.getSessionsByCourseListing(courseListingId));
     }
 
     @GetMapping("/{id}")

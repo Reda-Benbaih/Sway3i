@@ -1,5 +1,6 @@
 package enaa.sway3i.service;
 
+import enaa.sway3i.exception.ResourceNotFoundException;
 import enaa.sway3i.dto.request.PaymentRequest;
 import enaa.sway3i.dto.response.PaymentResponse;
 import enaa.sway3i.mapper.PaymentMapper;
@@ -31,13 +32,13 @@ public class PaymentService {
 
     public PaymentResponse getPaymentById(Long id) {
         Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("payment with this " + id + " does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("payment with this " + id + " does not exist"));
         return paymentMapper.toResponse(payment);
     }
 
     public PaymentResponse createPayment(PaymentRequest request) {
         Enrollment enrollment = enrollmentRepository.findById(request.getEnrollmentId())
-                .orElseThrow(() -> new RuntimeException("enrollment with this " + request.getEnrollmentId() + " does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("enrollment with this " + request.getEnrollmentId() + " does not exist"));
 
         Payment payment = paymentMapper.toEntity(request);
         payment.setEnrollment(enrollment);
@@ -51,10 +52,10 @@ public class PaymentService {
 
     public PaymentResponse updatePayment(Long id, PaymentRequest request) {
         Payment existingPayment = paymentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("payment with this " + id + " does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("payment with this " + id + " does not exist"));
 
         Enrollment enrollment = enrollmentRepository.findById(request.getEnrollmentId())
-                .orElseThrow(() -> new RuntimeException("enrollment with this " + request.getEnrollmentId() + " does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("enrollment with this " + request.getEnrollmentId() + " does not exist"));
 
         existingPayment.setAmount(request.getAmount());
         existingPayment.setBillingMonth(request.getBillingMonth());
@@ -67,7 +68,7 @@ public class PaymentService {
 
     public void deletePayment(Long id) {
         if (!paymentRepository.existsById(id)) {
-            throw new RuntimeException("payment with this " + id + " does not exist");
+            throw new ResourceNotFoundException("payment with this " + id + " does not exist");
         }
         paymentRepository.deleteById(id);
     }

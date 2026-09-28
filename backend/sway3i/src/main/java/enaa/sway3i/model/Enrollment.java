@@ -41,4 +41,8 @@ public class Enrollment {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "course_listing_id")
     private CourseListing courseListing;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "weekly_slot_id")
+    private WeeklySlot weeklySlot;
 }

@@ -1,11 +1,14 @@
 package enaa.sway3i.service;
 
+import enaa.sway3i.exception.ConflictException;
+import enaa.sway3i.exception.ResourceNotFoundException;
 import enaa.sway3i.dto.request.AdminRequest;
 import enaa.sway3i.dto.response.AdminResponse;
 import enaa.sway3i.mapper.AdminMapper;
 import enaa.sway3i.model.Admin;
 import enaa.sway3i.model.Role;
 import enaa.sway3i.repository.AdminRepository;
+import enaa.sway3i.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 public class AdminService {
 
     private final AdminRepository adminRepository;
+    private final UserRepository userRepository;
     private final AdminMapper adminMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -29,11 +33,22 @@ public class AdminService {
 
     public AdminResponse getAdminById(Long id) {
         Admin admin = adminRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("admin with this " + id + " does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("admin with this " + id + " does not exist"));
         return adminMapper.toResponse(admin);
     }
 
+    public AdminResponse registerFirstAdmin(AdminRequest request) {
+        if (adminRepository.count() > 0) {
+            throw new ConflictException("An admin account already exists");
+        }
+        return createAdmin(request);
+    }
+
     public AdminResponse createAdmin(AdminRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new ConflictException("An account with the email " + request.getEmail() + " already exists");
+        }
+
         Admin admin = adminMapper.toEntity(request);
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
         admin.setRole(Role.ADMIN);
@@ -44,7 +59,11 @@ public class AdminService {
 
     public AdminResponse updateAdmin(Long id, AdminRequest request) {
         Admin existingAdmin = adminRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("admin with this " + id + " does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("admin with this " + id + " does not exist"));
+
+        if (!existingAdmin.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())) {
+            throw new ConflictException("An account with the email " + request.getEmail() + " already exists");
+        }
 
         existingAdmin.setFirstName(request.getFirstName());
         existingAdmin.setLastName(request.getLastName());
@@ -61,7 +80,7 @@ public class AdminService {
 
     public void deleteAdmin(Long id) {
         if (!adminRepository.existsById(id)) {
-            throw new RuntimeException("admin with this " + id + " does not exist");
+            throw new ResourceNotFoundException("admin with this " + id + " does not exist");
         }
         adminRepository.deleteById(id);
     }

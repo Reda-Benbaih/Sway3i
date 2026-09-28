@@ -1,5 +1,6 @@
 package enaa.sway3i.service;
 
+import enaa.sway3i.exception.ResourceNotFoundException;
 import enaa.sway3i.dto.request.SubjectRequest;
 import enaa.sway3i.dto.response.SubjectResponse;
 import enaa.sway3i.mapper.SubjectMapper;
@@ -27,7 +28,7 @@ public class SubjectService {
 
     public SubjectResponse getSubjectById(Long id) {
         Subject subject = subjectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("subject with this" + id+"does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("subject with this " + id + " does not exist"));
         return subjectMapper.toResponse(subject);
     }
 
@@ -39,7 +40,7 @@ public class SubjectService {
 
     public SubjectResponse updateSubject(Long id, SubjectRequest request) {
         Subject existingSubject = subjectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("subject with this" + id+"does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("subject with this " + id + " does not exist"));
 
         existingSubject.setName(request.getName());
         existingSubject.setDescription(request.getDescription());
@@ -50,7 +51,7 @@ public class SubjectService {
 
     public void deleteSubject(Long id) {
         if (!subjectRepository.existsById(id)) {
-            throw new RuntimeException("subject with this" + id+"does not exist");
+            throw new ResourceNotFoundException("subject with this " + id + " does not exist");
         }
         subjectRepository.deleteById(id);
     }

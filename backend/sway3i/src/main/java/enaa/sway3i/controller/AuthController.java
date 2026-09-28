@@ -1,5 +1,9 @@
 package enaa.sway3i.controller;
 
+import enaa.sway3i.dto.validation.OnCreate;
+import enaa.sway3i.exception.ResourceNotFoundException;
+import org.springframework.validation.annotation.Validated;
+import enaa.sway3i.dto.request.AdminRequest;
 import enaa.sway3i.dto.request.LoginRequest;
 import enaa.sway3i.dto.request.StudentRequest;
 import enaa.sway3i.dto.request.TutorRequest;
@@ -8,6 +12,7 @@ import enaa.sway3i.model.User;
 import enaa.sway3i.repository.UserRepository;
 import enaa.sway3i.security.CustomUserDetails;
 import enaa.sway3i.security.JwtUtil;
+import enaa.sway3i.service.AdminService;
 import enaa.sway3i.service.StudentService;
 import enaa.sway3i.service.TutorService;
 import jakarta.validation.Valid;
@@ -28,6 +33,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final StudentService studentService;
     private final TutorService tutorService;
+    private final AdminService adminService;
     private final UserRepository userRepository;
 
     @PostMapping("/login")
@@ -41,20 +47,26 @@ public class AuthController {
     }
 
     @PostMapping("/register/student")
-    public ResponseEntity<AuthResponse> registerStudent(@Valid @RequestBody StudentRequest request) {
+    public ResponseEntity<AuthResponse> registerStudent(@Validated(OnCreate.class) @RequestBody StudentRequest request) {
         studentService.createStudent(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(buildAuthResponse(request.getEmail()));
     }
 
     @PostMapping("/register/tutor")
-    public ResponseEntity<AuthResponse> registerTutor(@Valid @RequestBody TutorRequest request) {
+    public ResponseEntity<AuthResponse> registerTutor(@Validated(OnCreate.class) @RequestBody TutorRequest request) {
         tutorService.createTutor(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(buildAuthResponse(request.getEmail()));
+    }
+
+    @PostMapping("/register/admin")
+    public ResponseEntity<AuthResponse> registerAdmin(@Validated(OnCreate.class) @RequestBody AdminRequest request) {
+        adminService.registerFirstAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(buildAuthResponse(request.getEmail()));
     }
 
     private AuthResponse buildAuthResponse(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("user with this " + email + " does not exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("user with this " + email + " does not exist"));
         return buildAuthResponse(user);
     }
 

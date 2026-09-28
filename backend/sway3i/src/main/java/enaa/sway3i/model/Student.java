@@ -18,9 +18,8 @@ import lombok.AllArgsConstructor;
 @SuperBuilder
 @AllArgsConstructor
 public class Student extends User {
-
     @Enumerated(EnumType.STRING)
     private Level level;
-
     private String school;
+    private String preferences;
 }

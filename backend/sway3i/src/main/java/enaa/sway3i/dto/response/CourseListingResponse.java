@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import enaa.sway3i.model.CourseFormat;
 import enaa.sway3i.model.CourseType;
+import enaa.sway3i.model.Level;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,4 +31,9 @@ public class CourseListingResponse {
     private Long subjectId;
     private String subjectName;
     private List<WeeklySlotResponse> weeklySlots;
+    private Level level;
+    private String tutorCity;
+    private BigDecimal tutorHourlyRate;
+    private Double tutorAverageRating;
+    private Boolean tutorVerified;
 }

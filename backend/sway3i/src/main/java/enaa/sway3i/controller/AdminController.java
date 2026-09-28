@@ -1,5 +1,7 @@
 package enaa.sway3i.controller;
 
+import enaa.sway3i.dto.validation.OnCreate;
+import org.springframework.validation.annotation.Validated;
 import enaa.sway3i.dto.request.AdminRequest;
 import enaa.sway3i.dto.response.AdminResponse;
 import enaa.sway3i.service.AdminService;
@@ -31,7 +33,7 @@ public class AdminController {
     }
 
     @PostMapping
-    public ResponseEntity<AdminResponse> createAdmin(@Valid @RequestBody AdminRequest request) {
+    public ResponseEntity<AdminResponse> createAdmin(@Validated(OnCreate.class) @RequestBody AdminRequest request) {
         return new ResponseEntity<>(adminService.createAdmin(request), HttpStatus.CREATED);
     }
 

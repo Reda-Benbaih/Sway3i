@@ -2,13 +2,17 @@ package enaa.sway3i.service;
 
 import enaa.sway3i.dto.request.CourseListingRequest;
 import enaa.sway3i.dto.response.CourseListingResponse;
+import enaa.sway3i.exception.ResourceNotFoundException;
 import enaa.sway3i.mapper.CourseListingMapper;
+import enaa.sway3i.model.CourseFormat;
 import enaa.sway3i.model.CourseListing;
+import enaa.sway3i.model.Level;
 import enaa.sway3i.model.Subject;
 import enaa.sway3i.model.Tutor;
 import enaa.sway3i.repository.CourseListingRepository;
 import enaa.sway3i.repository.SubjectRepository;
 import enaa.sway3i.repository.TutorRepository;
+import enaa.sway3i.security.CurrentUserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +22,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +48,9 @@ public class CourseListingServiceTest {
 
     @Mock
     private CourseListingMapper courseListingMapper;
+
+    @Mock
+    private CurrentUserService currentUserService;
 
     @InjectMocks
     private CourseListingService courseListingService;
@@ -108,6 +119,8 @@ public class CourseListingServiceTest {
 
     @Test
     void createCourseListing_success() {
+        when(currentUserService.isAdmin()).thenReturn(false);
+        when(currentUserService.getCurrentUserId()).thenReturn(1L);
         when(tutorRepository.findById(1L)).thenReturn(Optional.of(tutor));
         when(subjectRepository.findById(1L)).thenReturn(Optional.of(subject));
         when(courseListingMapper.toEntity(courseListingRequest)).thenReturn(courseListing);
@@ -125,7 +138,6 @@ public class CourseListingServiceTest {
     @Test
     void updateCourseListing_success() {
         when(courseListingRepository.findById(1L)).thenReturn(Optional.of(courseListing));
-        when(tutorRepository.findById(1L)).thenReturn(Optional.of(tutor));
         when(subjectRepository.findById(1L)).thenReturn(Optional.of(subject));
         when(courseListingRepository.save(any(CourseListing.class))).thenReturn(courseListing);
         when(courseListingMapper.toResponse(courseListing)).thenReturn(courseListingResponse);
@@ -139,8 +151,7 @@ public class CourseListingServiceTest {
 
     @Test
     void deleteCourseListing_success() {
-        when(courseListingRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(courseListingRepository).deleteById(1L);
+        when(courseListingRepository.findById(1L)).thenReturn(Optional.of(courseListing));
 
         courseListingService.deleteCourseListing(1L);
 
@@ -149,9 +160,56 @@ public class CourseListingServiceTest {
 
     @Test
     void deleteCourseListing_notFound() {
-        when(courseListingRepository.existsById(1L)).thenReturn(false);
+        when(courseListingRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> courseListingService.deleteCourseListing(1L));
+        assertThrows(ResourceNotFoundException.class, () -> courseListingService.deleteCourseListing(1L));
         verify(courseListingRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void updateCourseListing_byAnotherTutor_isForbidden() {
+        when(courseListingRepository.findById(1L)).thenReturn(Optional.of(courseListing));
+        doThrow(new AccessDeniedException("no")).when(currentUserService).checkOwnerOrAdmin(1L);
+
+        assertThrows(AccessDeniedException.class,
+                () -> courseListingService.updateCourseListing(1L, courseListingRequest));
+        verify(courseListingRepository, never()).save(any());
+    }
+
+    @Test
+    void searchCourseListings_hidesUnverifiedTutorsAndFiltersByLevel() {
+        ReflectionTestUtils.setField(courseListingService, "verifiedTutorsOnly", true);
+
+        Tutor verifiedTutor = new Tutor();
+        verifiedTutor.setId(2L);
+        verifiedTutor.setIsVerified(true);
+        verifiedTutor.setCity("Rabat");
+
+        CourseListing highSchoolMaths = listing(10L, verifiedTutor, Level.HIGH_SCHOOL);
+        CourseListing primaryMaths = listing(11L, verifiedTutor, Level.PRIMARY);
+        CourseListing fromUnverifiedTutor = listing(12L, tutor, Level.HIGH_SCHOOL);
+
+        when(courseListingRepository.findByIsActiveTrue())
+                .thenReturn(List.of(highSchoolMaths, primaryMaths, fromUnverifiedTutor));
+        when(courseListingMapper.toResponse(highSchoolMaths)).thenReturn(courseListingResponse);
+
+        List<CourseListingResponse> result = courseListingService.searchCourseListings(
+                null, null, Level.HIGH_SCHOOL, null, null, null, "rabat");
+
+        assertEquals(1, result.size());
+        verify(courseListingMapper).toResponse(highSchoolMaths);
+        verify(courseListingMapper, never()).toResponse(fromUnverifiedTutor);
+    }
+
+    private CourseListing listing(Long id, Tutor owner, Level level) {
+        CourseListing listing = new CourseListing();
+        listing.setId(id);
+        listing.setTutor(owner);
+        listing.setSubject(subject);
+        listing.setLevel(level);
+        listing.setMonthlyPrice(BigDecimal.valueOf(300));
+        listing.setCourseFormat(CourseFormat.IN_PERSON);
+        listing.setIsActive(true);
+        return listing;
     }
 }

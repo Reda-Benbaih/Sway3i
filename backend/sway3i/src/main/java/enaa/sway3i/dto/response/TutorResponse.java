@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import enaa.sway3i.model.Role;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,4 +29,7 @@ public class TutorResponse {
     private String nationalId;
     private Boolean isVerified;
     private Double averageRating;
+    private BigDecimal hourlyRate;
+    private String teachingZones;
+    private List<SubjectResponse> subjects;
 }

@@ -27,4 +27,7 @@ public class EnrollmentResponse {
     private String studentName;
     private Long courseListingId;
     private String courseTitle;
+    private Long weeklySlotId;
+    private Long tutorId;
+    private String tutorName;
 }

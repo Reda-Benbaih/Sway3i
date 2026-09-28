@@ -18,4 +18,8 @@ public class ReviewResponse {
     private String comment;
     private LocalDateTime publishedAt;
     private Long enrollmentId;
+    private Long studentId;
+    private String studentName;
+    private Long tutorId;
+    private String courseTitle;
 }

@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/weekly-slots")
 @RequiredArgsConstructor
@@ -22,6 +24,11 @@ public class WeeklySlotController {
     @GetMapping
     public ResponseEntity<Page<WeeklySlotResponse>> getAllWeeklySlots(Pageable pageable) {
         return ResponseEntity.ok(weeklySlotService.getAllWeeklySlots(pageable));
+    }
+
+    @GetMapping("/by-course-listing/{courseListingId}")
+    public ResponseEntity<List<WeeklySlotResponse>> getWeeklySlotsByCourseListing(@PathVariable Long courseListingId) {
+        return ResponseEntity.ok(weeklySlotService.getWeeklySlotsByCourseListing(courseListingId));
     }
 
     @GetMapping("/{id}")

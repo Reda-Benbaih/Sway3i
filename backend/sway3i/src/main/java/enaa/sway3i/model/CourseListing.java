@@ -34,6 +34,9 @@ public class CourseListing {
     @Enumerated(EnumType.STRING)
     private CourseFormat courseFormat;
 
+    @Enumerated(EnumType.STRING)
+    private Level level;
+
     private BigDecimal monthlyPrice;
     private Integer maxCapacity;
     private String locationOrLink;

@@ -2,6 +2,7 @@ package enaa.sway3i.controller;
 
 import enaa.sway3i.dto.request.TutorRequest;
 import enaa.sway3i.dto.response.TutorResponse;
+import enaa.sway3i.dto.validation.OnCreate;
 import enaa.sway3i.service.TutorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +26,13 @@ public class TutorController {
         return ResponseEntity.ok(tutorService.getAllTutors(pageable));
     }
 
+    // tutors waiting for an admin to validate their profile
+    @GetMapping("/pending-verification")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<TutorResponse>> getTutorsPendingVerification(Pageable pageable) {
+        return ResponseEntity.ok(tutorService.getTutorsPendingVerification(pageable));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<TutorResponse> getTutorById(@PathVariable Long id) {
         return ResponseEntity.ok(tutorService.getTutorById(id));
@@ -31,18 +40,26 @@ public class TutorController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TutorResponse> createTutor(@Valid @RequestBody TutorRequest request) {
+    public ResponseEntity<TutorResponse> createTutor(@Validated(OnCreate.class) @RequestBody TutorRequest request) {
         return new ResponseEntity<>(tutorService.createTutor(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('TUTOR', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.user.id")
     public ResponseEntity<TutorResponse> updateTutor(@PathVariable Long id, @Valid @RequestBody TutorRequest request) {
         return ResponseEntity.ok(tutorService.updateTutor(id, request));
     }
 
+    // profile validation is reserved to the admin (PUT /tutors/5/verify or /tutors/5/verify?verified=false)
+    @PutMapping("/{id}/verify")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TutorResponse> verifyTutor(@PathVariable Long id,
+                                                     @RequestParam(defaultValue = "true") boolean verified) {
+        return ResponseEntity.ok(tutorService.setVerified(id, verified));
+    }
+
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('TUTOR', 'ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or #id == principal.user.id")
     public ResponseEntity<Void> deleteTutor(@PathVariable Long id) {
         tutorService.deleteTutor(id);
         return ResponseEntity.noContent().build();

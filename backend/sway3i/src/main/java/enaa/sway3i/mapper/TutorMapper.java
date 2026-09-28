@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = SubjectMapper.class)
 public interface TutorMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -16,6 +16,7 @@ public interface TutorMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "isVerified", ignore = true)
     @Mapping(target = "averageRating", ignore = true)
+    @Mapping(target = "subjects", ignore = true)
     Tutor toEntity(TutorRequest request);
 
     TutorResponse toResponse(Tutor entity);
