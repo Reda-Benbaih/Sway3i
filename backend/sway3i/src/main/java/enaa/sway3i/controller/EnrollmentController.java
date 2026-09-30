@@ -63,7 +63,6 @@ public class EnrollmentController {
         return ResponseEntity.ok(enrollmentService.updateEnrollmentStatus(id, request));
     }
 
-    // students and tutors cancel the enrollment, an admin deletes it
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('STUDENT', 'TUTOR', 'ADMIN')")
     public ResponseEntity<Void> deleteEnrollment(@PathVariable Long id) {

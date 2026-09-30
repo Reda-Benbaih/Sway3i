@@ -19,6 +19,7 @@ public interface TutorMapper {
     @Mapping(target = "subjects", ignore = true)
     Tutor toEntity(TutorRequest request);
 
+    @Mapping(target = "reviewCount", ignore = true)
     TutorResponse toResponse(Tutor entity);
 
     List<TutorResponse> toResponseList(List<Tutor> entities);

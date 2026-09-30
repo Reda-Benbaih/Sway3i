@@ -27,7 +27,6 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getAllStudents(pageable));
     }
 
-    // a student sees their own profile, tutors can see the students who book their courses
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'TUTOR') or #id == principal.user.id")
     public ResponseEntity<StudentResponse> getStudentById(@PathVariable Long id) {

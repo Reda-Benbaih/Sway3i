@@ -12,4 +12,6 @@ public interface TutorRepository extends JpaRepository<Tutor, Long> {
 
     @Query("select t from Tutor t where t.isVerified = false or t.isVerified is null")
     Page<Tutor> findNotVerified(Pageable pageable);
+
+    Page<Tutor> findByIsVerifiedTrue(Pageable pageable);
 }

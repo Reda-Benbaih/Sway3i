@@ -18,7 +18,6 @@ public class SessionRequest {
     private LocalTime endTime;
     @NotNull(message = "Course listing ID is required")
     private Long courseListingId;
-    // optional on update, lets the tutor mark a session as done or cancelled
     private SessionStatus status;
 
     @AssertTrue(message = "End time must be after start time")

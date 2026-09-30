@@ -34,15 +34,12 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class EnrollmentService {
 
-    // enrollments that are still "alive" (a student can't book the same course twice)
     private static final Set<EnrollmentStatus> OPEN_STATUSES =
             Set.of(EnrollmentStatus.PENDING, EnrollmentStatus.CONFIRMED, EnrollmentStatus.ACTIVE);
 
-    // enrollments that take a seat in the course
     private static final Set<EnrollmentStatus> SEAT_STATUSES =
             Set.of(EnrollmentStatus.CONFIRMED, EnrollmentStatus.ACTIVE);
 
-    // which status can follow which one
     private static final Map<EnrollmentStatus, Set<EnrollmentStatus>> ALLOWED_TRANSITIONS = Map.of(
             EnrollmentStatus.PENDING, Set.of(EnrollmentStatus.CONFIRMED, EnrollmentStatus.REJECTED, EnrollmentStatus.CANCELLED),
             EnrollmentStatus.CONFIRMED, Set.of(EnrollmentStatus.ACTIVE, EnrollmentStatus.COMPLETED, EnrollmentStatus.CANCELLED),
@@ -110,7 +107,6 @@ public class EnrollmentService {
         return enrollmentMapper.toResponse(savedEnrollment);
     }
 
-    // admin only (checked in the controller)
     public EnrollmentResponse updateEnrollment(Long id, EnrollmentRequest request) {
         Enrollment existingEnrollment = findEnrollment(id);
         CourseListing courseListing = findCourseListing(request.getCourseListingId());
@@ -127,7 +123,6 @@ public class EnrollmentService {
         return enrollmentMapper.toResponse(updatedEnrollment);
     }
 
-    // the tutor of the course (or an admin) accepts, rejects, starts or completes an enrollment
     public EnrollmentResponse updateEnrollmentStatus(Long id, EnrollmentStatusRequest request) {
         Enrollment existingEnrollment = findEnrollment(id);
         currentUserService.checkOwnerOrAdmin(existingEnrollment.getCourseListing().getTutor().getId());
@@ -146,8 +141,6 @@ public class EnrollmentService {
         return enrollmentMapper.toResponse(updatedEnrollment);
     }
 
-    // an admin really deletes the enrollment, the student or the tutor only cancels it
-    // so it stays in the "cancelled" part of the dashboard
     public void deleteEnrollment(Long id) {
         Enrollment enrollment = findEnrollment(id);
 
@@ -168,7 +161,6 @@ public class EnrollmentService {
         }
     }
 
-    // makes sure there is still room in the course (and in the slot for individual courses)
     private void checkAvailability(CourseListing courseListing, WeeklySlot weeklySlot) {
         Integer maxCapacity = courseListing.getMaxCapacity();
         if (maxCapacity != null
@@ -193,7 +185,6 @@ public class EnrollmentService {
         return weeklySlot;
     }
 
-    // a student always books for their own account, an admin has to say for which student
     private Long resolveStudentId(EnrollmentRequest request) {
         if (!currentUserService.isAdmin()) {
             return currentUserService.getCurrentUserId();

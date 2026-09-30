@@ -32,4 +32,5 @@ public class TutorResponse {
     private BigDecimal hourlyRate;
     private String teachingZones;
     private List<SubjectResponse> subjects;
+    private Long reviewCount;
 }

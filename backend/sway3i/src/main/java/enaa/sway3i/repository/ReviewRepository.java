@@ -12,6 +12,7 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByEnrollmentId(Long enrollmentId);
     boolean existsByEnrollmentId(Long enrollmentId);
+    long countByEnrollment_CourseListing_Tutor_Id(Long tutorId);
     List<Review> findByEnrollment_CourseListing_Tutor_Id(Long tutorId);
 
     @Query("select avg(r.rating) from Review r where r.enrollment.courseListing.tutor.id = :tutorId")

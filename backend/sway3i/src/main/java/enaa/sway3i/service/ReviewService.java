@@ -50,7 +50,6 @@ public class ReviewService {
         return reviewMapper.toResponse(findReview(id));
     }
 
-    // a student can review a course only once, and only after it is completed
     public ReviewResponse createReview(ReviewRequest request) {
         Enrollment enrollment = enrollmentRepository.findById(request.getEnrollmentId())
                 .orElseThrow(() -> new ResourceNotFoundException("enrollment with this " + request.getEnrollmentId() + " does not exist"));
@@ -73,7 +72,6 @@ public class ReviewService {
         return reviewMapper.toResponse(savedReview);
     }
 
-    // the enrollment of a review can't be changed, only the rating and the comment
     public ReviewResponse updateReview(Long id, ReviewRequest request) {
         Review existingReview = findReview(id);
         currentUserService.checkOwnerOrAdmin(existingReview.getEnrollment().getStudent().getId());

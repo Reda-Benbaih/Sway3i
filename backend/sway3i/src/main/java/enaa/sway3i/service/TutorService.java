@@ -12,7 +12,9 @@ import enaa.sway3i.repository.ReviewRepository;
 import enaa.sway3i.repository.SubjectRepository;
 import enaa.sway3i.repository.TutorRepository;
 import enaa.sway3i.repository.UserRepository;
+import enaa.sway3i.security.CurrentUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,18 +35,25 @@ public class TutorService {
     private final ReviewRepository reviewRepository;
     private final TutorMapper tutorMapper;
     private final PasswordEncoder passwordEncoder;
+    private final CurrentUserService currentUserService;
+
+    @Value("${app.discovery.verified-tutors-only:true}")
+    private boolean verifiedTutorsOnly;
 
     public Page<TutorResponse> getAllTutors(Pageable pageable) {
-        Page<Tutor> tutors = tutorRepository.findAll(pageable);
-        return tutors.map(tutorMapper::toResponse);
+        boolean isAdmin = currentUserService.findCurrentUser().map(user -> user.getRole() == Role.ADMIN).orElse(false);
+        Page<Tutor> tutors = verifiedTutorsOnly && !isAdmin
+                ? tutorRepository.findByIsVerifiedTrue(pageable)
+                : tutorRepository.findAll(pageable);
+        return tutors.map(this::toVisibleResponse);
     }
 
     public Page<TutorResponse> getTutorsPendingVerification(Pageable pageable) {
-        return tutorRepository.findNotVerified(pageable).map(tutorMapper::toResponse);
+        return tutorRepository.findNotVerified(pageable).map(this::toVisibleResponse);
     }
 
     public TutorResponse getTutorById(Long id) {
-        return tutorMapper.toResponse(findTutor(id));
+        return toVisibleResponse(findTutor(id));
     }
 
     public TutorResponse createTutor(TutorRequest request) {
@@ -91,14 +100,12 @@ public class TutorService {
         return tutorMapper.toResponse(updatedTutor);
     }
 
-    // only an admin can call this (checked in the controller)
     public TutorResponse setVerified(Long id, boolean verified) {
         Tutor tutor = findTutor(id);
         tutor.setIsVerified(verified);
         return tutorMapper.toResponse(tutorRepository.save(tutor));
     }
 
-    // called every time a review is added, changed or removed
     public void refreshAverageRating(Long tutorId) {
         Tutor tutor = findTutor(tutorId);
         Double average = reviewRepository.findAverageRatingByTutorId(tutorId);
@@ -111,6 +118,17 @@ public class TutorService {
             throw new ResourceNotFoundException("tutor with this " + id + " does not exist");
         }
         tutorRepository.deleteById(id);
+    }
+
+    private TutorResponse toVisibleResponse(Tutor tutor) {
+        TutorResponse response = tutorMapper.toResponse(tutor);
+        response.setReviewCount(reviewRepository.countByEnrollment_CourseListing_Tutor_Id(tutor.getId()));
+        if (!currentUserService.isCurrentUserAdminOrSelf(tutor.getId())) {
+            response.setNationalId(null);
+            response.setEmail(null);
+            response.setPhone(null);
+        }
+        return response;
     }
 
     private Tutor findTutor(Long id) {

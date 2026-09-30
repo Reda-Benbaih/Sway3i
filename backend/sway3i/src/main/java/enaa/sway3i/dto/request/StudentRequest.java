@@ -20,7 +20,6 @@ public class StudentRequest {
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
-    // required on create, optional on update (empty keeps the old password)
     @NotBlank(groups = OnCreate.class, message = "Password is required")
     @Pattern(regexp = ValidationPatterns.PASSWORD, message = ValidationPatterns.PASSWORD_MESSAGE)
     private String password;

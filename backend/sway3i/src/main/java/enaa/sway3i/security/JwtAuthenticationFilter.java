@@ -43,8 +43,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             authenticate(request, jwt);
         } catch (JwtException | IllegalArgumentException | UsernameNotFoundException e) {
-            // invalid, expired or orphan token: the request continues as anonymous
-            // and Spring Security answers 401 if the endpoint needs a login
             SecurityContextHolder.clearContext();
         }
 

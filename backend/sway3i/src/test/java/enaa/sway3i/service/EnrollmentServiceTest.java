@@ -110,7 +110,7 @@ class EnrollmentServiceTest {
     @Test
     void createEnrollment_usesLoggedStudentAndStartsPending() {
         loggedInAsStudent();
-        request.setStudentId(99L); // must be ignored: a student books for their own account
+        request.setStudentId(99L);
         Enrollment enrollment = new Enrollment();
         when(enrollmentMapper.toEntity(request)).thenReturn(enrollment);
         when(enrollmentRepository.save(any(Enrollment.class))).thenReturn(enrollment);

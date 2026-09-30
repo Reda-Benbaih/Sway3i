@@ -4,6 +4,7 @@ import enaa.sway3i.security.CustomUserDetailsService;
 import enaa.sway3i.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.context.annotation.Bean;
@@ -46,6 +47,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/tutors", "/api/v1/tutors/*",
+                                "/api/v1/course-listings/**",
+                                "/api/v1/subjects/**",
+                                "/api/v1/reviews/by-tutor/*",
+                                "/api/v1/weekly-slots/by-course-listing/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))

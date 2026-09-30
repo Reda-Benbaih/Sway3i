@@ -33,7 +33,6 @@ public class CourseListingService {
     private final CourseListingMapper courseListingMapper;
     private final CurrentUserService currentUserService;
 
-    // when true, only listings of tutors validated by an admin appear in the discovery search
     @Value("${app.discovery.verified-tutors-only:true}")
     private boolean verifiedTutorsOnly;
 
@@ -51,7 +50,6 @@ public class CourseListingService {
                 .filter(c -> !verifiedTutorsOnly || Boolean.TRUE.equals(c.getTutor().getIsVerified()))
                 .filter(c -> subjectId == null || c.getSubject().getId().equals(subjectId))
                 .filter(c -> courseFormat == null || c.getCourseFormat() == courseFormat)
-                // a listing without a level is open to every level
                 .filter(c -> level == null || c.getLevel() == null || c.getLevel() == level)
                 .filter(c -> minPrice == null || c.getMonthlyPrice().compareTo(minPrice) >= 0)
                 .filter(c -> maxPrice == null || c.getMonthlyPrice().compareTo(maxPrice) <= 0)
@@ -103,7 +101,6 @@ public class CourseListingService {
         if (request.getIsActive() != null) {
             existingCourseListing.setIsActive(request.getIsActive());
         }
-        // only an admin can move a listing to another tutor
         if (currentUserService.isAdmin() && request.getTutorId() != null) {
             existingCourseListing.setTutor(findTutor(request.getTutorId()));
         }
@@ -118,7 +115,6 @@ public class CourseListingService {
         courseListingRepository.deleteById(id);
     }
 
-    // a tutor always creates listings for their own account, an admin has to say for which tutor
     private Long resolveTutorId(CourseListingRequest request) {
         if (!currentUserService.isAdmin()) {
             return currentUserService.getCurrentUserId();

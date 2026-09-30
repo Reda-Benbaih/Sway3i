@@ -7,15 +7,27 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class CurrentUserService {
 
     public User getCurrentUser() {
+        return findCurrentUser().orElseThrow(() -> new AccessDeniedException("You must be logged in"));
+    }
+
+    public Optional<User> findCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof CustomUserDetails details)) {
-            throw new AccessDeniedException("You must be logged in");
+            return Optional.empty();
         }
-        return details.getUser();
+        return Optional.of(details.getUser());
+    }
+
+    public boolean isCurrentUserAdminOrSelf(Long userId) {
+        return findCurrentUser()
+                .map(user -> user.getRole() == Role.ADMIN || user.getId().equals(userId))
+                .orElse(false);
     }
 
     public Long getCurrentUserId() {
@@ -30,7 +42,6 @@ public class CurrentUserService {
         return hasRole(Role.ADMIN);
     }
 
-    // passes when the current user is the owner of the resource or an admin
     public void checkOwnerOrAdmin(Long ownerId) {
         if (!isAdmin() && !getCurrentUserId().equals(ownerId)) {
             throw new AccessDeniedException("You do not have permission to access this resource");

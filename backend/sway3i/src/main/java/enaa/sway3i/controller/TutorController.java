@@ -26,7 +26,6 @@ public class TutorController {
         return ResponseEntity.ok(tutorService.getAllTutors(pageable));
     }
 
-    // tutors waiting for an admin to validate their profile
     @GetMapping("/pending-verification")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<TutorResponse>> getTutorsPendingVerification(Pageable pageable) {
@@ -50,7 +49,6 @@ public class TutorController {
         return ResponseEntity.ok(tutorService.updateTutor(id, request));
     }
 
-    // profile validation is reserved to the admin (PUT /tutors/5/verify or /tutors/5/verify?verified=false)
     @PutMapping("/{id}/verify")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TutorResponse> verifyTutor(@PathVariable Long id,

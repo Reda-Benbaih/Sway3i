@@ -4,6 +4,7 @@ import enaa.sway3i.dto.validation.OnCreate;
 import enaa.sway3i.exception.ResourceNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import enaa.sway3i.dto.request.AdminRequest;
+import enaa.sway3i.dto.request.GoogleLoginRequest;
 import enaa.sway3i.dto.request.LoginRequest;
 import enaa.sway3i.dto.request.StudentRequest;
 import enaa.sway3i.dto.request.TutorRequest;
@@ -13,6 +14,7 @@ import enaa.sway3i.repository.UserRepository;
 import enaa.sway3i.security.CustomUserDetails;
 import enaa.sway3i.security.JwtUtil;
 import enaa.sway3i.service.AdminService;
+import enaa.sway3i.service.GoogleAuthService;
 import enaa.sway3i.service.StudentService;
 import enaa.sway3i.service.TutorService;
 import jakarta.validation.Valid;
@@ -35,6 +37,7 @@ public class AuthController {
     private final TutorService tutorService;
     private final AdminService adminService;
     private final UserRepository userRepository;
+    private final GoogleAuthService googleAuthService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -62,6 +65,11 @@ public class AuthController {
     public ResponseEntity<AuthResponse> registerAdmin(@Validated(OnCreate.class) @RequestBody AdminRequest request) {
         adminService.registerFirstAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(buildAuthResponse(request.getEmail()));
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> googleLogin(@Valid @RequestBody GoogleLoginRequest request) {
+        return ResponseEntity.ok(buildAuthResponse(googleAuthService.authenticate(request)));
     }
 
     private AuthResponse buildAuthResponse(String email) {

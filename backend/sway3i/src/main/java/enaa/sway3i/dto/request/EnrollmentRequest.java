@@ -16,9 +16,7 @@ public class EnrollmentRequest {
     private LocalDate endDate;
     @NotNull(message = "Course listing ID is required")
     private Long courseListingId;
-    // the weekly slot of the course the student wants to book
     private Long weeklySlotId;
-    // ignored for students (taken from the token), required when an admin creates the enrollment
     private Long studentId;
 
     @AssertTrue(message = "End date must be after start date")
