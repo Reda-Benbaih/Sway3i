@@ -1,0 +1,88 @@
+:root {
+  --brand-950: #120e3f;
+  --brand-900: #1b1660;
+  --brand-800: #27208f;
+  --brand-700: #3328b8;
+  --brand-600: #4338ca;
+  --brand-500: #5b50e6;
+  --brand-400: #8178f0;
+  --brand-200: #d6d3fb;
+  --brand-100: #eceafd;
+  --brand-50: #f6f5ff;
+
+  --accent-700: #0f766e;
+  --accent-600: #0d9488;
+  --accent-500: #14b8a6;
+  --accent-400: #2dd4bf;
+  --accent-100: #ccfbf1;
+  --accent-50: #effdfa;
+
+  --gray-950: #0b1020;
+  --gray-900: #111827;
+  --gray-800: #1f2937;
+  --gray-700: #374151;
+  --gray-600: #4b5563;
+  --gray-500: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-300: #d1d5db;
+  --gray-200: #e5e7eb;
+  --gray-100: #f1f3f7;
+  --gray-50: #f8f9fc;
+  --white: #ffffff;
+
+  --success-600: #15803d;
+  --success-100: #dcfce7;
+  --warning-600: #b45309;
+  --warning-100: #fef3c7;
+  --danger-600: #dc2626;
+  --danger-700: #b91c1c;
+  --danger-100: #fee2e2;
+  --info-600: #2563eb;
+  --info-100: #dbeafe;
+  --star: #f59e0b;
+
+  --bg: var(--gray-50);
+  --surface: var(--white);
+  --surface-muted: var(--gray-100);
+  --text: var(--gray-900);
+  --text-muted: var(--gray-600);
+  --text-soft: var(--gray-500);
+  --border: var(--gray-200);
+  --border-strong: var(--gray-300);
+  --focus-ring: 0 0 0 3px rgba(91, 80, 230, 0.28);
+
+  --font: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: clamp(2rem, 4vw, 2.75rem);
+  --text-hero: clamp(2.25rem, 5.2vw, 3.6rem);
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+  --radius-full: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 8px 20px -6px rgba(17, 14, 63, 0.12), 0 2px 6px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 24px 48px -16px rgba(17, 14, 63, 0.22);
+
+  --container: 1180px;
+  --gutter: 16px;
+  --navbar-h: 68px;
+  --sidebar-w: 256px;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 28px;
+  }
+}

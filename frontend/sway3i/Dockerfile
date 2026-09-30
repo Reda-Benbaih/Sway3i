@@ -3,6 +3,10 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+# Vite puts these values in the bundle at build time
+ARG VITE_API_URL=http://localhost:8080/api/v1
+ARG VITE_GOOGLE_CLIENT_ID=
+ENV VITE_API_URL=$VITE_API_URL VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 RUN npm run build
 
 FROM nginx:alpine
